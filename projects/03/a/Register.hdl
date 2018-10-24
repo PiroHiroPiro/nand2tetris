@@ -1,0 +1,50 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/Register.hdl
+
+/**
+ * 16-bit register:
+ * If load[t] == 1 then out[t+1] = in[t]
+ * else out does not change
+ */
+
+CHIP Register {
+    IN in[16], load;
+    OUT out[16];
+
+    PARTS:
+    // Put your code here:
+    Mux(a=feedback0, b=in[0], sel=load, out=selected0);
+    DFF(in=selected0, out=feedback0, out=out[0]);
+    Mux(a=feedback1, b=in[1], sel=load, out=selected1);
+    DFF(in=selected1, out=feedback1, out=out[1]);
+    Mux(a=feedback2, b=in[2], sel=load, out=selected2);
+    DFF(in=selected2, out=feedback2, out=out[2]);
+    Mux(a=feedback3, b=in[3], sel=load, out=selected3);
+    DFF(in=selected3, out=feedback3, out=out[3]);
+    Mux(a=feedback4, b=in[4], sel=load, out=selected4);
+    DFF(in=selected4, out=feedback4, out=out[4]);
+    Mux(a=feedback5, b=in[5], sel=load, out=selected5);
+    DFF(in=selected5, out=feedback5, out=out[5]);
+    Mux(a=feedback6, b=in[6], sel=load, out=selected6);
+    DFF(in=selected6, out=feedback6, out=out[6]);
+    Mux(a=feedback7, b=in[7], sel=load, out=selected7);
+    DFF(in=selected7, out=feedback7, out=out[7]);
+    Mux(a=feedback8, b=in[8], sel=load, out=selected8);
+    DFF(in=selected8, out=feedback8, out=out[8]);
+    Mux(a=feedback9, b=in[9], sel=load, out=selected9);
+    DFF(in=selected9, out=feedback9, out=out[9]);
+    Mux(a=feedback10, b=in[10], sel=load, out=selected10);
+    DFF(in=selected10, out=feedback10, out=out[10]);
+    Mux(a=feedback11, b=in[11], sel=load, out=selected11);
+    DFF(in=selected11, out=feedback11, out=out[11]);
+    Mux(a=feedback12, b=in[12], sel=load, out=selected12);
+    DFF(in=selected12, out=feedback12, out=out[12]);
+    Mux(a=feedback13, b=in[13], sel=load, out=selected13);
+    DFF(in=selected13, out=feedback13, out=out[13]);
+    Mux(a=feedback14, b=in[14], sel=load, out=selected14);
+    DFF(in=selected14, out=feedback14, out=out[14]);
+    Mux(a=feedback15, b=in[15], sel=load, out=selected15);
+    DFF(in=selected15, out=feedback15, out=out[15]);
+}
