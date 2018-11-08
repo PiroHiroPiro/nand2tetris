@@ -25,13 +25,13 @@
   @j
   D=M
   @arr
-  A=M+D
+  A=A+D
   M=0
 // arr[j]=17
   @j
   D=M
   @arr
-  D=M+D
+  D=A+D
   @tmp
   M=D
   @17
