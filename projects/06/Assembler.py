@@ -172,7 +172,10 @@ class Assembler:
         self.hack.close()
 
     def __del__(self):
-        self._break_stream()
+        try:
+            self._break_stream()
+        except:
+            pass
 
     def _labelSearch(self):
         self._make_stream()
