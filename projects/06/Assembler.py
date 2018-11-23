@@ -257,6 +257,10 @@ class Assembler:
             elif command_type == C_COMMAND:
                 self.parser.parse()
                 binary = C_BINARY % (self.parser.comp2bin(), self.parser.dest2bin(), self.parser.jump2bin())
+            else:
+                del self.parser
+                line = self.asm.readline()
+                continue
 
             self.hack.write(binary)
             del self.parser
