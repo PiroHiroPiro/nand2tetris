@@ -12,14 +12,29 @@ A_BINARY = '0%s\n'
 C_BINARY = '111%s%s%s\n'
 
 class Parser:
-    def __init__(self, line):
-        self.line = self._remove_comment(line).strip()
+    def __init__(self, asm):
+        self.asm = [self._remove_comment(line).strip() for line in asm if self._remove_comment(line).strip()]
+        self.index = -1
+        self.line = ''
         self.dest = 'null'
         self.comp = 'null'
         self.jump = 'null'
 
-    def emptyLine(self):
-        return not self.line
+    def nextLine(self):
+        if len(self.asm) - 1 > self.index:
+            self.index += 1
+            self.line = self.asm[self.index]
+            return True
+        else:
+            self.index = -1
+            self.line = ''
+            return False
+
+    def rmLabel(self):
+            _ = self.asm.pop(self.index)
+            line_number = self.index
+            self.index -= 1
+            return line_number
 
     def commandType(self):
         if re.match('@.*$', self.line):
@@ -137,7 +152,7 @@ class SymbolTable:
         for i in range(0,16):
             label = "R" + str(i)
             self.symbol_table[label] = i
-        self.variable_cursor = 15
+        self.variable_cursor = 16 - 1
 
     def addEntry(self, symbol, address):
         self.symbol_table[symbol] = address
@@ -153,128 +168,68 @@ class SymbolTable:
         return self.symbol_table[symbol]
 
 class Assembler:
-    def __init__(self, asm):
-        self.asm_file = asm
-        target = asm[:asm.index('.asm')]
-        self.hack_file = target + '.hack'
-        self.st = SymbolTable()
-
-    def _make_stream(self):
+    def __init__(self, asm_file_name):
         try:
-            self.asm = open(self.asm_file, mode='r')
-            self.hack = open(self.hack_file, mode='w')
+            asm_file_name
+            target = asm_file_name[:asm_file_name.index('.asm')]
+            hack_file_name = target + '.hack'
+            asms = []
+            with open(asm_file_name, mode='r') as asmf:
+                asms = asmf.read().split('\n')
+
+            self.hack_file = open(hack_file_name, mode='w')
+            self.parser = Parser(asms)
+            self.st = SymbolTable()
         except:
             print('No such file or directory.')
             del self
 
-    def _break_stream(self):
-        self.asm.close()
-        self.hack.close()
-
     def __del__(self):
-        try:
-            self._break_stream()
-        except:
-            pass
+        self.hack_file.close()
 
     def _labelSearch(self):
-        self._make_stream()
-        line = self.asm.readline()
-        line_number = 0
-        while line:
-            self.parser = Parser(line)
-
-            if self.parser.emptyLine():
-                del self.parser
-                line = self.asm.readline()
-                continue
-
-            command_type = self.parser.commandType()
-            if command_type == L_COMMAND:
+        while self.parser.nextLine():
+            if self.parser.commandType() == L_COMMAND:
                 symbol = self.parser.symbol()
+                line_number = self.parser.rmLabel()
                 self.st.addEntry(symbol, line_number)
-                line_number -= 1
-
-            line_number += 1
-            del self.parser
-            line = self.asm.readline()
-
-        self._break_stream()
 
     def _variableSearch(self):
-        self._make_stream()
-        line = self.asm.readline()
-
-        while line:
-            self.parser = Parser(line)
-
-            if self.parser.emptyLine():
-                del self.parser
-                line = self.asm.readline()
-                continue
-
-            command_type = self.parser.commandType()
-            if command_type == A_COMMAND:
+        while self.parser.nextLine():
+            if self.parser.commandType() == A_COMMAND:
                 symbol = self.parser.symbol()
-                if not re.match('\A[0-9]+$', symbol) and not self.st.contains(symbol):
+                if not re.match('[0-9]+$', symbol) and not self.st.contains(symbol):
                     address = self.st.nextAddress()
                     self.st.addEntry(symbol, address)
-
-            del self.parser
-            line = self.asm.readline()
-
-        self._break_stream()
 
     def assemble(self):
         self._labelSearch()
         self._variableSearch()
-        self._make_stream()
-        line = self.asm.readline()
-        while line:
+        while self.parser.nextLine():
             binary = ''
-            self.parser = Parser(line)
-
-            if self.parser.emptyLine():
-                del self.parser
-                line = self.asm.readline()
-                continue
 
             command_type = self.parser.commandType()
-            if command_type == L_COMMAND:
-                del self.parser
-                line = self.asm.readline()
-                continue
-
-            elif command_type == A_COMMAND:
+            if command_type == A_COMMAND:
                 symbol = self.parser.symbol()
-                if re.match('\A[0-9]+$', symbol):
+                if re.match('[0-9]+$', symbol):
                     address = int(symbol)
                 else:
                     address = self.st.getAddress(symbol)
-
                 binary = A_BINARY % format(address, '015b')
 
             elif command_type == C_COMMAND:
                 self.parser.parse()
                 binary = C_BINARY % (self.parser.comp2bin(), self.parser.dest2bin(), self.parser.jump2bin())
             else:
-                del self.parser
-                line = self.asm.readline()
                 continue
 
-            self.hack.write(binary)
-            del self.parser
-            line = self.asm.readline()
-        self._break_stream()
+            self.hack_file.write(binary)
 
 if __name__ == '__main__':
-
-    # parser argument
     parser = argparse.ArgumentParser()
     parser.add_argument("asm", help="required : please set asm file", type=str)
     args = parser.parse_args()
     asm = args.asm.strip()
 
-    # assemble
     assembler = Assembler(asm)
     assembler.assemble()
