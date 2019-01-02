@@ -5,9 +5,14 @@ import argparse
 import os
 
 
+# DEFINE CONSTANT
+COMMENT = '//'
+VM_EXT = '.vm'
+ASM_EXT = '.asm'
+
+
 class Parser:
     def __init__(self, vm_filename: str):
-        text = None
         with open(vm_filename, mode='r') as vm_file:
             text = vm_file.read().split('\n')
         self.lines = [self._remove_comment(line) for line in text if self._remove_comment(line).strip()]
@@ -24,7 +29,7 @@ class Parser:
             self.command = []
             return False
 
-    def command_type(self) -> int:
+    def command_type(self) -> str:
         command = self.argn(0)
         if command in ['add', 'sub', 'neg', 'eq', 'gt', 'lt', 'and', 'or', 'not']:
             return 'C_ARITHMETIC'
@@ -53,7 +58,7 @@ class Parser:
         return self.command[n]
 
     def _remove_comment(self, line: str) -> str:
-        comment_idx = line.find('//')
+        comment_idx = line.find(COMMENT)
         if comment_idx == -1:
             clean_line = line.strip()
         else:
@@ -74,10 +79,7 @@ class CodeWriter:
     def __del__(self):
         self.close()
 
-    def close(self):
-        self.asm.close()
-
-    def set_file_name(self, vm_filename: str):
+    def set_filename(self, vm_filename: str):
         self.current_vm_file = os.path.splitext(os.path.basename(vm_filename))[0]
 
     def write(self, line: str):
@@ -206,6 +208,9 @@ class CodeWriter:
         self.write('@SP')
         self.write('A=M')
 
+    def _close(self):
+        self.asm.close()
+
 
 class VMTranslator:
     def __init__(self, src: str):
@@ -221,13 +226,13 @@ class VMTranslator:
             print('No such file or directory.')
             return '', []
 
-        if os.path.isfile(file_path) and file_path.endswith('.vm'):
-            asm_file = file_path.replace('.vm', '.asm')
+        if os.path.isfile(file_path) and file_path.endswith(VM_EXT):
+            asm_file = file_path.replace(VM_EXT, ASM_EXT)
             vm_files = [file_path]
 
         elif os.path.isdir(file_path):
             dir_path = file_path[:-1] if file_path[-1] == '/' else file_path
-            asm_file = dir_path + '/' + os.path.basename(dir_path) + '.asm'
+            asm_file = dir_path + '/' + os.path.basename(dir_path) + ASM_EXT
             vm_files = _find_all_files_with_ext(dir_path, 'vm')
 
         return asm_file, vm_files
@@ -243,7 +248,7 @@ class VMTranslator:
 
     def _translate(self, vm_file: str):
         parser = Parser(vm_file)
-        self.code_writer.set_file_name(vm_file)
+        self.code_writer.set_filename(vm_file)
         self.code_writer.write('// ----------  %s ----------' % self.code_writer.current_vm_file)
 
         while parser.next_line():
