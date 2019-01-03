@@ -11,6 +11,10 @@ VM_EXT = '.vm'
 ASM_EXT = '.asm'
 
 
+def raise_exception(message: str):
+    raise ValueError(message)
+
+
 class Parser:
     def __init__(self, vm_filename: str):
         with open(vm_filename, mode='r') as vm_file:
@@ -50,7 +54,7 @@ class Parser:
         elif command in ['call']:
             return 'C_CALL'
         else:
-            self._raise_exception(command)
+            raise_exception('%s is an invalid command.' % command)
 
     def argn(self, n: int) -> str:
         if len(self.command) <= n:
@@ -64,9 +68,6 @@ class Parser:
         else:
             clean_line = line[:comment_idx].strip()
         return clean_line
-
-    def _raise_exception(self, command: str):
-        raise ValueError(command, '%s is an invalid command.')
 
 
 class CodeWriter:
@@ -128,7 +129,7 @@ class CodeWriter:
             self.write('(ENDBOOL.%d)' % self.bool_count)
             self.bool_count += 1
         else:
-            raise ValueError('{0} is an invalid operation.'.format(operation))
+            raise_exception('%s is an invalid operation.' % operation)
 
         self._increment_SP()
 
@@ -149,7 +150,7 @@ class CodeWriter:
             self.write('A=M')
             self.write('M=D')
         else:
-            raise ValueError('{0} is an invalid command.'.format(command))
+            raise_exception('%s is an invalid command.' % command)
 
     def _resolve_address(self, segment: str, index: str):
         '''Resolve address to A register'''
@@ -167,7 +168,7 @@ class CodeWriter:
             self.write('@' + str(index))
             self.write('A=D+A')  # D is segment base
         else:
-            raise ValueError('{0} is an invalid segment.'.format(segment))
+            raise_exception('%s is an invalid segment.' % segment)
 
     def _address_dict(self):
         return {
