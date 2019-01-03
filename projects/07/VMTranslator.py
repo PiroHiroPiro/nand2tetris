@@ -78,7 +78,7 @@ class CodeWriter:
         self.addresses = self._address_dict()
 
     def __del__(self):
-        self.close()
+        self._close()
 
     def set_filename(self, vm_filename: str):
         self.current_vm_file = os.path.splitext(os.path.basename(vm_filename))[0]
@@ -172,20 +172,20 @@ class CodeWriter:
 
     def _address_dict(self):
         return {
-            'local':    'LCL',   # Base R1
+            'local'   : 'LCL',   # Base R1
             'argument': 'ARG',   # Base R2
-            'this':     'THIS',  # Base R3
-            'that':     'THAT',  # Base R4
-            'pointer':  3,       # Edit R3, R4
-            'temp':     5,       # Edit R5-12
+            'this'    : 'THIS',  # Base R3
+            'that'    : 'THAT',  # Base R4
+            'pointer' : 3,       # Edit R3, R4
+            'temp'    : 5,       # Edit R5-12
                                  # R13-15 are free
-            'static':   16,      # Edit R16-255
+            'static'  : 16,      # Edit R16-255
         }
 
     def _push_D_to_stack(self):
         '''Push from D onto top of stack, increment @SP'''
 
-        self.write('@SP') #  Get current stack pointer
+        self.write('@SP')  # Get current stack pointer
         self.write('A=M')  # Set address to current stack pointer
         self.write('M=D')  # Write data to top of stack
         self._increment_SP()  # Increment SP
@@ -234,11 +234,11 @@ class VMTranslator:
         elif os.path.isdir(file_path):
             dir_path = file_path[:-1] if file_path[-1] == '/' else file_path
             asm_file = dir_path + '/' + os.path.basename(dir_path) + ASM_EXT
-            vm_files = _find_all_files_with_ext(dir_path, 'vm')
+            vm_files = self._find_all_files_with_ext(dir_path, 'vm')
 
         return asm_file, vm_files
 
-    def _find_all_files_with_ext(dir_path: str, ext: str) -> list:
+    def _find_all_files_with_ext(self, dir_path: str, ext: str) -> list:
         ext_files = []
         suffix = os.extsep + ext.lower()
         for cur_dir, _, files in os.walk(dir_path):
@@ -266,9 +266,9 @@ class VMTranslator:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("vm", help="required : please set path of vm file or directory include vm file", type=str)
-    args = parser.parse_args()
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("vm", help="required : please set path of vm file or directory include vm file", type=str)
+    args = argparser.parse_args()
     target = args.vm.strip()
     vm_translator = VMTranslator(target)
     vm_translator.translates()
