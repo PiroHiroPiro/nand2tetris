@@ -20,17 +20,17 @@ class Parser:
         with open(vm_filename, mode='r') as vm_file:
             text = vm_file.read().split('\n')
         self.lines = [self._remove_comment(line) for line in text if self._remove_comment(line).strip()]
-        self.index = 0
+        self.line_index = 0
         self.command = []
         self.command_dict = self._command_dict()
 
     def next_line(self) -> bool:
-        if len(self.lines) > self.index:
-            self.command = self.lines[self.index].split(' ')
-            self.index += 1
+        if len(self.lines) > self.line_index:
+            self.command = self.lines[self.line_index].split(' ')
+            self.line_index += 1
             return True
         else:
-            self.index = 0
+            self.line_index = 0
             self.command = []
             return False
 
@@ -45,6 +45,9 @@ class Parser:
         if len(self.command) <= n:
             return ''
         return self.command[n]
+
+    def command_line(self) -> str:
+        return '%d : %s' % (self.line_index, ' '.join(self.command))
 
     def _remove_comment(self, line: str) -> str:
         comment_idx = line.find(COMMENT)
@@ -253,7 +256,7 @@ class VMTranslator:
         self.code_writer.write('// ----------  %s ----------' % self.code_writer.current_vm_file)
 
         while parser.next_line():
-            self.code_writer.write('// ' + ' '.join(parser.command))
+            self.code_writer.write('// ' + parser.command_line())
             if parser.command_type() == 'C_PUSH':
                 self.code_writer.write_push_pop('C_PUSH', parser.argn(1), parser.argn(2))
             elif parser.command_type() == 'C_POP':
