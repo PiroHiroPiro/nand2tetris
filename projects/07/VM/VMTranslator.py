@@ -136,24 +136,23 @@ class CodeWriter:
 
         self._increment_SP()
 
-    def write_push_pop(self, command: str, segment: str, index: str):
+    def write_push(self, segment: str, index: str):
         self._resolve_address(segment, index)
-        if command == 'C_PUSH':  # load M[address] to D
-            if segment == 'constant':
-                self.write('D=A')
-            else:
-                self.write('D=M')
-            self._push_D_to_stack()
-        elif command == 'C_POP':  # load D to M[address]
+        if segment == 'constant':
             self.write('D=A')
-            self.write('@R13')  # Store resolved address in R13
-            self.write('M=D')
-            self._pop_stack_to_D()
-            self.write('@R13')
-            self.write('A=M')
-            self.write('M=D')
         else:
-            raise_exception('%s is an invalid command.' % command)
+            self.write('D=M')
+        self._push_D_to_stack()
+
+    def write_pop(self, segment: str, index: str):
+        self._resolve_address(segment, index)
+        self.write('D=A')
+        self.write('@R13')  # Store resolved address in R13
+        self.write('M=D')
+        self._pop_stack_to_D()
+        self.write('@R13')
+        self.write('A=M')
+        self.write('M=D')
 
     def _resolve_address(self, segment: str, index: str):
         '''Resolve address to A register'''
@@ -257,12 +256,12 @@ class VMTranslator:
 
         while parser.next_line():
             self.code_writer.write('// ' + parser.command_line())
-            if parser.command_type() == 'C_PUSH':
-                self.code_writer.write_push_pop('C_PUSH', parser.argn(1), parser.argn(2))
-            elif parser.command_type() == 'C_POP':
-                self.code_writer.write_push_pop('C_POP', parser.argn(1), parser.argn(2))
-            elif parser.command_type() == 'C_ARITHMETIC':
+            if parser.command_type() == 'C_ARITHMETIC':
                 self.code_writer.write_arithmetic(parser.argn(0))
+            elif parser.command_type() == 'C_PUSH':
+                self.code_writer.write_push(parser.argn(1), parser.argn(2))
+            elif parser.command_type() == 'C_POP':
+                self.code_writer.write_pop(parser.argn(1), parser.argn(2))
 
             self.code_writer.write('')
         self.code_writer.write('// ------------------------------')
