@@ -22,6 +22,7 @@ class Parser:
         self.lines = [self._remove_comment(line) for line in text if self._remove_comment(line).strip()]
         self.index = 0
         self.command = []
+        self.command_dict = self._command_dict()
 
     def next_line(self) -> bool:
         if len(self.lines) > self.index:
@@ -35,26 +36,10 @@ class Parser:
 
     def command_type(self) -> str:
         command = self.argn(0)
-        if command in ['add', 'sub', 'neg', 'eq', 'gt', 'lt', 'and', 'or', 'not']:
-            return 'C_ARITHMETIC'
-        elif command in ['push']:
-            return 'C_PUSH'
-        elif command in ['pop']:
-            return 'C_POP'
-        elif command in ['label']:
-            return 'C_LABEL'
-        elif command in ['goto']:
-            return 'C_GOTO'
-        elif command in ['if-goto']:
-            return 'C_IF'
-        elif command in ['function']:
-            return 'C_FUNCTION'
-        elif command in ['RETURN']:
-            return 'C_RETURN'
-        elif command in ['call']:
-            return 'C_CALL'
-        else:
+        command_type = self.command_dict.get(command, None)
+        if command_type is None:
             raise_exception('%s is an invalid command.' % command)
+        return command_type
 
     def argn(self, n: int) -> str:
         if len(self.command) <= n:
@@ -68,6 +53,21 @@ class Parser:
         else:
             clean_line = line[:comment_idx].strip()
         return clean_line
+
+    def _command_dict(self) -> dict:
+        return {
+            'add'     : 'C_ARITHMETIC',
+            'sub'     : 'C_ARITHMETIC',
+            'neg'     : 'C_ARITHMETIC',
+            'eq'      : 'C_ARITHMETIC',
+            'gt'      : 'C_ARITHMETIC',
+            'lt'      : 'C_ARITHMETIC',
+            'and'     : 'C_ARITHMETIC',
+            'or'      : 'C_ARITHMETIC',
+            'not'     : 'C_ARITHMETIC',
+            'push'    : 'C_PUSH',
+            'pop'     : 'C_POP'
+        }
 
 
 class CodeWriter:
