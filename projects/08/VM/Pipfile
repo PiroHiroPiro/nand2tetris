@@ -15,4 +15,4 @@ python_version = "3.6"
 
 [scripts]
 pylint = "pylint ./VMTranslator.py --disable='C0103,C0111,C0301,R0201,R0911,R0903,R1705,R1710,E0401,E0611'"
-flake = "flake8 --show-source ./VMTranslator.py --ignore='E203,E501'"
+flake = "flake8 --show-source ./VMTranslator.py --ignore='E203,E241,E501'"

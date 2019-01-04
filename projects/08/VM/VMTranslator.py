@@ -47,7 +47,7 @@ class Parser:
         return self.command[n]
 
     def command_line(self) -> str:
-        return ('%d : %s' % (self.line_index, ' '.join(self.command)))
+        return '%d : %s' % (self.line_index, ' '.join(self.command))
 
     def _remove_comment(self, line: str) -> str:
         comment_idx = line.find(COMMENT)
@@ -229,7 +229,7 @@ class CodeWriter:
     def _push_D_to_stack(self):
         '''Push from D onto top of stack, increment @SP'''
 
-        self.write('@SP') #  Get current stack pointer
+        self.write('@SP')  # Get current stack pointer
         self.write('A=M')  # Set address to current stack pointer
         self.write('M=D')  # Write data to top of stack
         self._increment_SP()  # Increment SP
