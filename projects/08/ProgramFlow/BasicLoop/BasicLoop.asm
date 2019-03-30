@@ -1,3 +1,54 @@
+// bootstrap
+@256
+D=A
+@SP
+M=D
+@Sys.init.return.0
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@LCL
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+D=M
+@LCL
+M=D
+@5
+D=D-A
+@ARG
+M=D
+@Sys.init
+0;JMP
+(Sys.init.return.0)
 // ----------  BasicLoop ----------
 // 1 : push constant 0
 @0
@@ -25,7 +76,7 @@ A=M
 M=D
 
 // 3 : label LOOP_START
-(BasicLoop.LOOP_START)
+(BasicLoop$LOOP_START)
 
 // 4 : push argument 0
 @ARG
@@ -147,7 +198,7 @@ M=M+1
 M=M-1
 A=M
 D=M
-@BasicLoop.LOOP_START
+@BasicLoop$LOOP_START
 D;JNE
 
 // 14 : push local 0
@@ -163,3 +214,4 @@ M=D
 M=M+1
 
 // ------------------------------
+

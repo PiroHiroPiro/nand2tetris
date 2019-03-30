@@ -1,3 +1,54 @@
+// bootstrap
+@256
+D=A
+@SP
+M=D
+@Sys.init.return.0
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@LCL
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+D=M
+@LCL
+M=D
+@5
+D=D-A
+@ARG
+M=D
+@Sys.init
+0;JMP
+(Sys.init.return.0)
 // ----------  FibonacciSeries ----------
 // 1 : push argument 1
 @ARG
@@ -125,7 +176,7 @@ A=M
 M=D
 
 // 11 : label MAIN_LOOP_START
-(FibonacciSeries.MAIN_LOOP_START)
+(FibonacciSeries$MAIN_LOOP_START)
 
 // 12 : push argument 0
 @ARG
@@ -144,15 +195,15 @@ M=M+1
 M=M-1
 A=M
 D=M
-@FibonacciSeries.COMPUTE_ELEMENT
+@FibonacciSeries$COMPUTE_ELEMENT
 D;JNE
 
 // 14 : goto END_PROGRAM
-@FibonacciSeries.END_PROGRAM
+@FibonacciSeries$END_PROGRAM
 0;JMP
 
 // 15 : label COMPUTE_ELEMENT
-(FibonacciSeries.COMPUTE_ELEMENT)
+(FibonacciSeries$COMPUTE_ELEMENT)
 
 // 16 : push that 0
 @THAT
@@ -302,10 +353,11 @@ A=M
 M=D
 
 // 28 : goto MAIN_LOOP_START
-@FibonacciSeries.MAIN_LOOP_START
+@FibonacciSeries$MAIN_LOOP_START
 0;JMP
 
 // 29 : label END_PROGRAM
-(FibonacciSeries.END_PROGRAM)
+(FibonacciSeries$END_PROGRAM)
 
 // ------------------------------
+
