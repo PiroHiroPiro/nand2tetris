@@ -5,7 +5,7 @@ A repository for learning [nand2tetris](https://www.nand2tetris.org/).
 ## Requirement
 
 - Python:3.6 or later
-- Pipenv:2018.11.26
+- Pipenv:2018.11.26 or later
 
 ## Install
 
